@@ -13,10 +13,13 @@ int main(int argc, char *argv[ ]){
     char lang[2];
     char store[MAX][10]={0,0};
     char word[MAX][50]={0,0}, coordinate[MAX][50]={0,0}, flame[50]={0};
-    int imgheight = 1169, imgwidth = 826;
+    char imgheight[5], imgwidth[5];
     int i = 0, j = 0, k = 0;
 
-    if (argc != 3){
+    strcpy(&imgheight[0], argv[3]);
+    strcpy(&imgwidth[0], argv[4]);
+
+    if (argc != 5){
        printf("Wrong argument.\n");
     exit(1);
     }
@@ -148,13 +151,13 @@ int main(int argc, char *argv[ ]){
     fprintf(fpout,"<meta name='ocr-capabilities' content='ocr_page ocr_carea ocr_par ocr_line ocrx_word'/>\n");
     fprintf(fpout,"</head>\n");
     fprintf(fpout,"<body>\n");
-    fprintf(fpout,"%s%i%s%i%s","<div class='ocr_page' id='page_1' title='image \"test.jpg\"; bbox 0 0 ",imgwidth," ",imgheight,"; ppageno 0'>\n");
+    fprintf(fpout,"%s%s%s%s%s","<div class='ocr_page' id='page_1' title='image \"test.jpg\"; bbox 0 0 ",imgwidth," ",imgheight,"; ppageno 0'>\n");
 
     for(int k = 1; k <= j; k++) {
 
        fprintf(fpout,"%s%i%s%s%s","<div class='ocr_carea' id='block_1_",k,"' title=\"bbox ", &coordinate[k][1],"\">\n");
        fprintf(fpout,"%s%i%s%s%s","<p class='ocr_par' dir='ltr' id='par_1_",k,"' title=\"bbox ",&coordinate[k][1],"\">\n");
-       fprintf(fpout,"%s%i%s%s%s","<span class='ocr_line' id='line_1_",k,"' title=\"bbox ",&coordinate[k][1],"; baseline 0.002 -21; x_size 89; x_descenders 20; x_ascenders 21\">");
+       fprintf(fpout,"%s%i%s%s%s","<span class='ocr_line' id='line_1_",k,"' title=\"bbox ",&coordinate[k][1],"; baseline 0 -10; x_size 89; x_descenders 20; x_ascenders 21\">");
 
        while ((p = strstr(&coordinate[k][1],"\n"))!=NULL) *p = '\0';
        fprintf(fpout,"%s%i%s","<span class='ocrx_word' id='word_1_",k,"' title='bbox ");
