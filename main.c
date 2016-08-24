@@ -16,9 +16,6 @@ int main(int argc, char *argv[ ]){
     char imgheight[5], imgwidth[5];
     int i = 0, j = 0, k = 0;
 
-    strcpy(&imgheight[0], argv[3]);
-    strcpy(&imgwidth[0], argv[4]);
-
     if (argc != 5){
        printf("Wrong argument.\n");
     exit(1);
@@ -33,6 +30,9 @@ int main(int argc, char *argv[ ]){
        printf("No output file.\n");
     exit(1);
     }
+
+    strcpy(&imgheight[0], argv[3]);
+    strcpy(&imgwidth[0], argv[4]);
 
     fpout1 = fopen("preout1.txt","w");
 
