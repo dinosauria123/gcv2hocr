@@ -10,10 +10,11 @@ int main(int argc, char *argv[ ]){
     char buf[MAX]={0};
     char *p;
     char *ary[3];
-    char lang[2];
+    char lang[3];
     char store[MAX][10]={0,0};
     char word[MAX][50]={0,0}, coordinate[MAX][50]={0,0}, flame[50]={0};
     char imgheight[5], imgwidth[5];
+    int offset = -5; //Adjust for proper y-position. English = -5, Japanese = 0
     int i = 0, j = 0, k = 0;
 
     if (argc != 5){
@@ -66,7 +67,7 @@ int main(int argc, char *argv[ ]){
           while ((p = strstr(buf,"   ")) != NULL) *p = '\n';
           while ((p = strstr(buf,"\n")) != NULL) *p = '\0';
 
-          if(i % 2 == 0){
+          if(i % 2 == 1 && i != 1){
              fprintf(fpout1,"%s\n",buf);
           }
        }
@@ -84,7 +85,16 @@ int main(int argc, char *argv[ ]){
 
           i++;
           if(i == 1){
-             strcpy(&lang[0],buf);
+             if(strstr(buf, "en")){
+                strcpy(&lang[1],"eng");
+                offset = -5;
+             }
+
+             if(strstr(buf, "ja")){
+                strcpy(&lang[1],"jpn");
+                offset = 0;
+             }
+
              continue;
           }
           else{
@@ -117,9 +127,9 @@ int main(int argc, char *argv[ ]){
              if(i % 3 == 2){
                 strcpy(&store[1][1], strtok(buf," "));
                 strcpy(&store[2][1], strtok(NULL," "));
-                strcat(&store[2][1]," ");
-                strcat(&store[2][1],&store[1][1]);
-                strcat(&coordinate[j][1],&store[2][1]);
+                strcat(&store[1][1]," ");
+                strcat(&store[1][1],&store[2][1]);
+                strcpy(&coordinate[j][1],&store[1][1]);
                 strcat(&coordinate[j][1]," ");
                 k = j;
                 continue;
@@ -128,9 +138,9 @@ int main(int argc, char *argv[ ]){
              if(i % 3 == 0){
                 strcpy(&store[1][1], strtok(buf," "));
                 strcpy(&store[2][1], strtok(NULL," "));
-                strcat(&store[2][1]," ");
-                strcat(&store[2][1],&store[1][1]);
-                strcat(&coordinate[k][1],&store[2][1]);
+                strcat(&store[1][1]," ");
+                strcat(&store[1][1],&store[2][1]);
+                strcat(&coordinate[k][1],&store[1][1]);
                 strcat(&coordinate[k][1]," ");
                 continue;
              }
@@ -157,14 +167,15 @@ int main(int argc, char *argv[ ]){
 
        fprintf(fpout,"%s%i%s%s%s","<div class='ocr_carea' id='block_1_",k,"' title=\"bbox ", &coordinate[k][1],"\">\n");
        fprintf(fpout,"%s%i%s%s%s","<p class='ocr_par' dir='ltr' id='par_1_",k,"' title=\"bbox ",&coordinate[k][1],"\">\n");
-       fprintf(fpout,"%s%i%s%s%s","<span class='ocr_line' id='line_1_",k,"' title=\"bbox ",&coordinate[k][1],"; baseline 0 -10; x_size 89; x_descenders 20; x_ascenders 21\">");
+       fprintf(fpout,"%s%i%s%s%s%i%s","<span class='ocr_line' id='line_1_",k,"' title=\"bbox ",&coordinate[k][1],"; baseline 0 ",offset,"; x_size 89; x_descenders 20; x_ascenders 21\">");
 
        while ((p = strstr(&coordinate[k][1],"\n"))!=NULL) *p = '\0';
        fprintf(fpout,"%s%i%s","<span class='ocrx_word' id='word_1_",k,"' title='bbox ");
        fprintf(fpout,"%s%s",&coordinate[k][1],"; x_wconf 85' ");
 //       printf("%s\n",&coordinate[k][1]);
        while ((p = strstr(&word[k][1],"\n"))!=NULL) *p = '\0';
-       fprintf(fpout,"lang='eng' dir='ltr'>%s</span> ", &word[k][1]);
+       fprintf(fpout,"lang='%s'", &lang[1]);
+       fprintf(fpout," dir='ltr'>%s</span> ", &word[k][1]);
 //       printf("%s\n",&word[k][1]);
 
        fprintf(fpout,"\n");
