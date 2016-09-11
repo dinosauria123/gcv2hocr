@@ -1,53 +1,61 @@
 # gcv2hocr
-
 gcv2hocr converts from Google Cloud Vision OCR output to hocr to make a searchable pdf.
 
+<!-- BEGIN-MARKDOWN-TOC -->
+* [Installation](#installation)
+* [Usage](#usage)
+	* [How to get OCR (json) data:](#how-to-get-ocr-json-data)
+* [How to make a searchable pdf:](#how-to-make-a-searchable-pdf)
+* [Acknowledgments](#acknowledgments)
+* [Licence](#licence)
+
+<!-- END-MARKDOWN-TOC -->
+
+## Installation
 
 Compile:
 
 gcc main.c -o gcv2hocr
 
+## Usage
 
-Usage:
-
+```sh
 gcv2hocr test.jpg.json output.hocr 1280 960
+```
 
-test.jpg.json is a output of Google Cloud Vision OCR.
-output.hocr is a output of gcv2hocr.
+`test.jpg.json` is a output of [Google Cloud Vision OCR](https://cloud.google.com/vision/docs/).
+`output.hocr` is a output of gcv2hocr.
 
-First number "1280" is image height of the picture.
-Second number "960" is image width of the picture.
+First number `1280` is image height of the picture.
+Second number `960` is image width of the picture.
 
-gcv2hocr also generate preout1.txt and preout2.txt.
+gcv2hocr also generates intermediary files `preout1.txt` and `preout2.txt`.
 
-
-How to get OCR (json) data:
+### How to get OCR (json) data:
 
 Execute gcvocr.sh.
 
+```sh
 ./gcvocr.sh test.jpg "Your API KEY"
+```
 
-gcvocr.sh is slightly modified sample.sh originally written by Kazuhiro FURUHATA (openspc@alpha.ocn.ne.jp).
+gcvocr.sh is slightly modified [sample.sh originally written by Kazuhiro
+FURUHATA (openspc@alpha.ocn.ne.jp)](http://www.openspc2.org/reibun/CloudVision/v1/code/bash/0002/index.html).
 
-http://www.openspc2.org/reibun/CloudVision/v1/code/bash/0002/index.html
- 
+## How to make a searchable pdf:
 
-How to make a searchable pdf:
+To create a searchable pdf, use the `hocr-pdf` script bundled with
+[hocr-tools](https://github.com/tmbdev/hocr-tools).
 
-To make a searchable pdf, I used hocr-tools obtained here.
-https://github.com/tmbdev/hocr-tools
-
-You may use hocr-pdf to make a searchable pdf.
-
-
-Acknowledgment:
+## Acknowledgments
 
 To Kazuhiro FURUHATA, he gave me a permission redistribute and modify sample.sh.
+
 To Philipp Zumstein, he gave me answers several questions about hocr.
 
+## Licence
 
-Licence:
-
+```
 Creative Commons Attribution 4.0 International.
 
 You are free to:
@@ -57,8 +65,7 @@ You are free to:
     for any purpose, even commercially.
 
     The licensor cannot revoke these freedoms as long as you follow the license terms.
-
-
+```
 
 2016.9.2 ENDO Michiaki (inugami.mamoru@gmail.com)
 
