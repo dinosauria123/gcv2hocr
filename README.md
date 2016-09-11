@@ -15,7 +15,27 @@ gcv2hocr converts from Google Cloud Vision OCR output to hocr to make a searchab
 
 Compile:
 
-gcc main.c -o gcv2hocr
+```
+make
+```
+
+Install to `/usr/local/bin`:
+
+```
+make install
+```
+
+Install to `$HOME/.local/bin`:
+
+```
+make install PREFIX=$HOME/.local
+```
+
+Uninstall:
+
+```
+make uninstall
+```
 
 ## Usage
 
