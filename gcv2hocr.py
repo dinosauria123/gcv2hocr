@@ -15,30 +15,39 @@ class GCVAnnotation:
     <title>$title</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <meta name='ocr-system' content='gcv2hocr.py' />
-    <meta name='ocr-capabilities' content='ocr_page ocr_line ocrx_word ocrp_lang'/>
+    <meta name='ocr-langs' content='$lang' />
+    <meta name='ocr-number-of-pages' content='1' />
+    <meta name='ocr-capabilities' content='ocr_page ocr_carea ocr_line ocrx_word ocrp_lang'/>
   </head>
   <body>
-    <div class='ocr_page' lang='$lang' title='bbox $x0 $y0 $x1 $y1'>$content
+    <div class='ocr_page' lang='$lang' title='bbox 0 0 $page_width $page_height'>
+        <div class='ocr_carea' lang='$lang' title='bbox $x0 $y0 $x1 $y1'>$content</div>
     </div>
   </body>
 </html>
     """),
         'ocr_line': Template("""
-    <span class='ocr_line' id='$htmlid' title='bbox $x0 $y0 $x1 $y1'>$content
-    </span>"""),
+            <span class='ocr_line' id='$htmlid' title='bbox $x0 $y0 $x1 $y1; baseline $baseline'>$content
+            </span>"""),
         'ocrx_word': Template("""
-        <span class='ocrx_word' id='$htmlid' title='bbox $x0 $y0 $x1 $y1'>$content</span>""")
+                <span class='ocrx_word' id='$htmlid' title='bbox $x0 $y0 $x1 $y1'>$content</span>""")
     }
 
     def __init__(self,
                  htmlid=None,
                  ocr_class=None,
                  lang='unknown',
+                 baseline="0 -5",
+                 page_height=None,
+                 page_width=None,
                  content=[],
                  box=None,
                  title=''):
         self.title = title
         self.htmlid = htmlid
+        self.baseline = baseline
+        self.page_height = page_height
+        self.page_width = page_width
         self.lang = lang
         self.ocr_class = ocr_class
         self.content = content
@@ -64,7 +73,7 @@ class GCVAnnotation:
             content = self.content
         return self.__class__.templates[self.ocr_class].substitute(self.__dict__, content=content)
 
-def fromResponse(resp, baseline_tolerance=2, lang='unknown', title=''):
+def fromResponse(resp, baseline_tolerance=2, **kwargs):
     last_baseline = -100
     page = None
     curline = None
@@ -73,11 +82,10 @@ def fromResponse(resp, baseline_tolerance=2, lang='unknown', title=''):
         if anno_idx == 0:
             page = GCVAnnotation(
                 ocr_class='ocr_page',
-                lang=lang,
-                title=title,
                 htmlid='page_0',
-                content=[],
-                box=box)
+                box=box,
+                **kwargs
+                )
             continue
         word = GCVAnnotation(ocr_class='ocrx_word', content=anno_json['description'], box=box)
         if word.y1-abs(last_baseline) > baseline_tolerance:
@@ -93,11 +101,19 @@ def fromResponse(resp, baseline_tolerance=2, lang='unknown', title=''):
     for line in page.content:
         line.maximize_bbox()
     page.maximize_bbox()
+    if not page.page_width: page.page_width = page.x1
+    if not page.page_height: page.page_height = page.y1
     return page
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('gcv_file', help='GCV JSON file, "-" for STDIN')
+    parser.add_argument(
+        "--baseline",
+        "-B",
+        help="Baseline offset",
+        metavar="pn pn-1 ...",
+        default="0 0")
     parser.add_argument(
         "--baseline-tolerance",
         "-T",
@@ -115,22 +131,19 @@ if __name__ == '__main__':
         default='unknown',
         help="Language")
     parser.add_argument(
-        "--width",
+        "--page-width",
         "-W",
         help="Image width. Automatically detected unless specified")
     parser.add_argument(
-        "--height",
+        "--page-height",
         "-H",
         help="Image height. Automatically detected unless specified")
     args = parser.parse_args()
 
     instream = sys.stdin if args.gcv_file is '-' else open(args.gcv_file, 'r')
     resp = json.load(instream)['responses'][0]
-    page = fromResponse(
-        resp,
-        title=args.title,
-        lang=args.lang,
-        baseline_tolerance=args.baseline_tolerance)
+    del(args.gcv_file)
+    page = fromResponse(resp, **args.__dict__)
     if str == bytes:
         print(page.render().encode('utf-8'))
     else:
