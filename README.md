@@ -51,6 +51,12 @@ Second number `960` is image width of the picture.
 
 gcv2hocr also generates intermediary files `preout1.txt` and `preout2.txt`.
 
+You may use gcv2hocr.py.
+
+```sh
+python gcv2hocr.py test.jpg.json > output.hocr
+```
+
 ### How to get OCR (json) data:
 
 Execute gcvocr.sh.
@@ -72,6 +78,8 @@ To create a searchable pdf, use the `hocr-pdf` script bundled with
 To Kazuhiro FURUHATA, he gave me a permission redistribute and modify sample.sh.
 
 To Philipp Zumstein, he gave me answers several questions about hocr.
+
+To Konstantin Baierer, he wrote python port (gcv2hocr.py).
 
 ## Licence
 
