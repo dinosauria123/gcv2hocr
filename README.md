@@ -40,18 +40,24 @@ make uninstall
 ## Usage
 
 ```sh
-gcv2hocr test.jpg.json output.hocr 1280 960
+gcv2hocr test.jpg.json output.hocr
 ```
 
 `test.jpg.json` is a output of [Google Cloud Vision OCR](https://cloud.google.com/vision/docs/).
 `output.hocr` is a output of gcv2hocr.
+
+You may specify image size in argument.
+
+```sh
+gcv2hocr test.jpg.json output.hocr 1280 960
+```
 
 First number `1280` is image height of the picture.
 Second number `960` is image width of the picture.
 
 gcv2hocr also generates intermediary files `preout1.txt` and `preout2.txt`.
 
-You may use gcv2hocr.py.
+You may use gcv2hocr.py instead of gcv2hocr executable.
 
 ```sh
 python gcv2hocr.py test.jpg.json > output.hocr

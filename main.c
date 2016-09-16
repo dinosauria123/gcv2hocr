@@ -1,4 +1,4 @@
-#include<stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -12,15 +12,10 @@ int main(int argc, char *argv[ ]){
     char *ary[3];
     char lang[3];
     char store[MAX][10]={0,0};
-    char word[MAX][50]={0,0}, coordinate[MAX][50]={0,0}, flame[50]={0};
-    char imgheight[5], imgwidth[5];
+    char word[MAX][50]={0,0}, coordinate[MAX][50]={0,0}, frame[50]={0};
+    char imgheight[5]="0" , imgwidth[5]="0";
     int offset = -5; //Adjust for proper y-position. English = -5, Japanese = 0
     int i = 0, j = 0, k = 0;
-
-    if (argc != 5){
-       printf("Wrong argument.\n");
-    exit(1);
-    }
 
     if ((fpin=fopen (argv[1],"r")) == NULL ){
        printf("No input file.\n");
@@ -32,8 +27,20 @@ int main(int argc, char *argv[ ]){
     exit(1);
     }
 
-    strcpy(&imgheight[0], argv[3]);
-    strcpy(&imgwidth[0], argv[4]);
+    if (argc > 5){
+       printf("Wrong argument.\n");
+    exit(1);
+    }
+
+    if ((argv[3] != NULL) && (argv[4] != NULL)){
+       strcpy(&imgheight[0], argv[3]);
+       strcpy(&imgwidth[0], argv[4]);
+    }
+
+    if (!((isdigit(imgheight[0]) && (isdigit(imgwidth[0]))))){
+       printf("Wrong image size.\n");
+    exit(1);
+    }
 
     fpout1 = fopen("preout1.txt","w");
 
@@ -103,8 +110,8 @@ int main(int argc, char *argv[ ]){
                 strcpy(&store[2][1], strtok(NULL," "));
                 strcat(&store[2][1]," ");
                 strcat(&store[2][1],&store[1][1]);
-                strcat(&flame[0],&store[2][1]);
-                strcat(&flame[0]," ");
+                strcat(&frame[0],&store[2][1]);
+                strcat(&frame[0]," ");
                 continue;
              }
 
@@ -113,8 +120,8 @@ int main(int argc, char *argv[ ]){
                 strcpy(&store[2][1], strtok(NULL," "));
                 strcat(&store[2][1]," ");
                 strcat(&store[2][1],&store[1][1]);
-                strcat(&flame[0],&store[2][1]);
-                strcat(&flame[0]," ");
+                strcat(&frame[0],&store[2][1]);
+                strcat(&frame[0]," ");
                 continue;
              }
 
