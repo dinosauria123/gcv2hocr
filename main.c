@@ -172,8 +172,8 @@ int main(int argc, char *argv[ ]){
 
     for(int k = 1; k <= j; k++) {
 
-       fprintf(fpout,"%s%i%s%s%s","<div class='ocr_carea' id='block_1_",k,"' title=\"bbox ", &coordinate[k][1],"\">\n");
-       fprintf(fpout,"%s%i%s%s%s","<p class='ocr_par' dir='ltr' id='par_1_",k,"' title=\"bbox ",&coordinate[k][1],"\">\n");
+//       fprintf(fpout,"%s%i%s%s%s","<div class='ocr_carea' id='block_1_",k,"' title=\"bbox ", &coordinate[k][1],"\">\n");
+//       fprintf(fpout,"%s%i%s%s%s","<p class='ocr_par' dir='ltr' id='par_1_",k,"' title=\"bbox ",&coordinate[k][1],"\">\n");
        fprintf(fpout,"%s%i%s%s%s%i%s","<span class='ocr_line' id='line_1_",k,"' title=\"bbox ",&coordinate[k][1],"; baseline 0 ",offset,"; x_size 89; x_descenders 20; x_ascenders 21\">");
 
        while ((p = strstr(&coordinate[k][1],"\n"))!=NULL) *p = '\0';
@@ -187,8 +187,8 @@ int main(int argc, char *argv[ ]){
 
        fprintf(fpout,"\n");
        fprintf(fpout,"</span>\n");
-       fprintf(fpout,"</p>\n");
-       fprintf(fpout,"</div>\n");
+//       fprintf(fpout,"</p>\n");
+//       fprintf(fpout,"</div>\n");
     }
 
     fprintf(fpout,"</div>\n");
