@@ -74,6 +74,15 @@ int main(int argc, char *argv[ ]){
           while ((p = strstr(buf,"   ")) != NULL) *p = '\n';
           while ((p = strstr(buf,"\n")) != NULL) *p = '\0';
 
+          // Replace xml escape characters
+
+          while ((p = strstr(buf,"&")) != NULL){
+             memmove(p,"&amp;",5);
+             break;
+          }
+          while ((p = strstr(buf,"<")) != NULL) strcpy(buf,"&lt;");
+          while ((p = strstr(buf,">")) != NULL) strcpy(buf,"&gt;");
+
           if(i % 2 == 1 && i != 1){
              fprintf(fpout1,"%s\n",buf);
           }
