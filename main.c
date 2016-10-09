@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#define MAX 2048
+#define MAX 4096
 
 int main(int argc, char *argv[ ]){
     FILE *fpin,*fpout,*fpout1;

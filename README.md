@@ -79,6 +79,8 @@ FURUHATA (openspc@alpha.ocn.ne.jp)](http://www.openspc2.org/reibun/CloudVision/v
 To create a searchable pdf, use the `hocr-pdf` script bundled with
 [hocr-tools](https://github.com/tmbdev/hocr-tools).
 
+makepdf.sh is a sample shell script to make a searchable pdf from indivisual jpeg files.
+
 ## Acknowledgments
 
 To Kazuhiro FURUHATA, he gave me a permission redistribute and modify sample.sh.
