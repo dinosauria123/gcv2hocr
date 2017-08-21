@@ -5,7 +5,7 @@
 #define MAX 4096
 
 int main(int argc, char *argv[ ]){
-    FILE *fpin,*fpout,*fpout1;
+    FILE *fpin,*fpout,*fpout0,*fpout1;
     char command[256];
     char buf[MAX]={0};
     char *p;
@@ -41,12 +41,31 @@ int main(int argc, char *argv[ ]){
        printf("Wrong image size.\n");
     exit(1);
     }
+	
+	fpout0 = fopen("preout0.txt","w");
+	fpin=fopen (argv[1],"r");
 
-    fpout1 = fopen("preout1.txt","w");
+// Delete lines below "fullTextAnnotation" tag
+	
+	while(fgets(buf, MAX, fpin) != NULL ){
 
+       if (strstr(buf,"fullTextAnnotation") != NULL){
+		   break;	   
+	   }
+
+	fprintf(fpout0,"%s",buf);
+   
+	}	
+
+    fclose(fpout0);
+    fclose(fpin);
+	
+	fpout1 = fopen("preout1.txt","w");
+	fpin=fopen ("preout0.txt","r");
+	
     while(fgets(command, 256, fpin) != NULL){
        while(fgets(buf, MAX, fpin) != NULL ){
-
+	   		  
 // Delete tags
 
           ary[0] = strtok(buf,":");
@@ -57,7 +76,7 @@ int main(int argc, char *argv[ ]){
           }
        }
     }
-
+	
     fclose(fpout1);
     fclose(fpin);
 
@@ -67,7 +86,7 @@ int main(int argc, char *argv[ ]){
        while(fgets(buf,MAX,fpin) != NULL ){
 
           i++;
-
+		  
           while ((p = strstr(buf,"[")) != NULL) *p = '\0';
           while ((p = strstr(buf,"{")) != NULL) *p = '\0';
           while ((p = strstr(buf,"\"")) != NULL) *p = ' ';
@@ -82,17 +101,17 @@ int main(int argc, char *argv[ ]){
           }
           while ((p = strstr(buf,"<")) != NULL) strcpy(buf,"&lt;");
           while ((p = strstr(buf,">")) != NULL) strcpy(buf,"&gt;");
-
+  
           if(i % 2 == 1 && i != 1){
              fprintf(fpout1,"%s\n",buf);
           }
        }
     }
-
+	
     fclose(fpout1);
     fclose(fpin);
     i = 0;
-
+	
 // Extract parameters
 
     if((fpin=fopen("preout2.txt","r"))!=NULL){
