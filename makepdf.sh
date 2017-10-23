@@ -28,5 +28,4 @@ echo "Generating out.pdf"
 python hocr-pdf ./ > out0.pdf
 
 echo "Reducing pdf size"
-gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/default -dNOPAUSE -dQUIET -dBATCH -sOutputFile=out.pdf out0.pdf
-#rm ./out0.pdf
+gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/default -dNOPAUSE -dQUIET -dBATCH -dAutoRotatePages=/None -sOutputFile=Victoryetc.pdf out0.pdf
