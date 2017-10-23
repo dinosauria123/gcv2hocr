@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#define MAX 4096
+#define MAX 8192
 
 int main(int argc, char *argv[ ]){
     FILE *fpin,*fpout,*fpout0,*fpout1;
@@ -124,6 +124,12 @@ int main(int argc, char *argv[ ]){
                 strcpy(&lang[1],"eng");
                 offset = -5;
              }
+
+             if(strstr(buf, "de")){
+                strcpy(&lang[1],"deu");
+                offset = -5;
+             }
+
 
              if(strstr(buf, "ja")){
                 strcpy(&lang[1],"jpn");
