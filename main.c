@@ -10,7 +10,7 @@ int main(int argc, char *argv[ ]){
     char buf[MAX]={0};
     char *p;
     char *ary[3];
-    char lang[3];
+    char lang[4];
     char store[MAX][10]={0,0};
     char word[MAX][50]={0,0}, coordinate[MAX][50]={0,0}, frame[50]={0};
     char imgheight[5]="0" , imgwidth[5]="0";
@@ -121,18 +121,18 @@ int main(int argc, char *argv[ ]){
           i++;
           if(i == 1){
              if(strstr(buf, "en")){
-                strcpy(&lang[1],"eng");
+                strcpy(&lang[0],"eng");
                 offset = -5;
              }
 
              if(strstr(buf, "de")){
-                strcpy(&lang[1],"deu");
+                strcpy(&lang[0],"deu");
                 offset = -5;
              }
 
 
              if(strstr(buf, "ja")){
-                strcpy(&lang[1],"jpn");
+                strcpy(&lang[0],"jpn");
                 offset = 0;
              }
 
@@ -215,7 +215,7 @@ int main(int argc, char *argv[ ]){
        fprintf(fpout,"%s%s",&coordinate[k][1],"; x_wconf 85' ");
 //       printf("%s\n",&coordinate[k][1]);
        while ((p = strstr(&word[k][1],"\n"))!=NULL) *p = '\0';
-       fprintf(fpout,"lang='%s'", &lang[1]);
+       fprintf(fpout,"lang='%s'", &lang[0]);
        fprintf(fpout," dir='ltr'>%s</span> ", &word[k][1]);
 //       printf("%s\n",&word[k][1]);
 
