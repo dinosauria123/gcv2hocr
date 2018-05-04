@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <ctype.h>
 #define MAX 8192
 
 int main(int argc, char *argv[ ]){
-    FILE *fpin,*fpout,*fpout0,*fpout1;
-    char command[256];
+    FILE *fpin,*fpout;
     char buf[MAX]={0};
     char *p;
     char *ary[3];
@@ -42,28 +42,42 @@ int main(int argc, char *argv[ ]){
     exit(1);
     }
 	
-	fpout0 = fopen("preout0.txt","w");
+	fpout = fopen("preout0.txt","w");
 	fpin=fopen (argv[1],"r");
 
-// Delete lines below "fullTextAnnotation" tag
-	
-	while(fgets(buf, MAX, fpin) != NULL ){
+while(fgets(buf, MAX, fpin) != NULL ){
+     if (strstr(buf, "languageCode") != NULL){   
+	fprintf(fpout,"%s",buf);
+        break;
+     }
+}
 
-       if (strstr(buf,"fullTextAnnotation") != NULL){
-		   break;	   
-	   }
+while(fgets(buf, MAX, fpin) != NULL ){
 
-	fprintf(fpout0,"%s",buf);
+      if (strstr(buf,"                                  \"x\"") != NULL){   
+	fprintf(fpout,"%s",buf);
+        continue;
+	}
+
+      if (strstr(buf,"                                  \"y\"") != NULL){
+	fprintf(fpout,"%s",buf);
+        continue;
+	}
    
-	}	
+      if (strstr(buf,"                            \"text\"") != NULL){
+          while ((p = strstr(buf,",")) != NULL) *p = ' ';
+	    fprintf(fpout,"%s",buf);
+            continue;
+	}
 
-    fclose(fpout0);
+}
+
+    fclose(fpout);
     fclose(fpin);
 	
-	fpout1 = fopen("preout1.txt","w");
+	fpout = fopen("preout1.txt","w");
 	fpin=fopen ("preout0.txt","r");
 	
-    while(fgets(command, 256, fpin) != NULL){
        while(fgets(buf, MAX, fpin) != NULL ){
 	   		  
 // Delete tags
@@ -72,26 +86,23 @@ int main(int argc, char *argv[ ]){
           ary[1] = strtok(NULL,",");
 
           if(ary[1] != NULL){
-        	fprintf(fpout1,"%s",ary[1]);
+        	fprintf(fpout,"%s",ary[1]);
           }
        }
-    }
+
 	
-    fclose(fpout1);
+    fclose(fpout);
     fclose(fpin);
 
-    fpout1 = fopen("preout2.txt","w");
+    fpout= fopen("preout2.txt","w");
+
 
     if((fpin=fopen("preout1.txt","r"))!=NULL){
        while(fgets(buf,MAX,fpin) != NULL ){
 
           i++;
 		  
-          while ((p = strstr(buf,"[")) != NULL) *p = '\0';
-          while ((p = strstr(buf,"{")) != NULL) *p = '\0';
           while ((p = strstr(buf,"\"")) != NULL) *p = ' ';
-          while ((p = strstr(buf,"   ")) != NULL) *p = '\n';
-          while ((p = strstr(buf,"\n")) != NULL) *p = '\0';
 
           // Replace xml escape characters
 
@@ -101,15 +112,21 @@ int main(int argc, char *argv[ ]){
           }
           while ((p = strstr(buf,"<")) != NULL) strcpy(buf,"&lt;");
           while ((p = strstr(buf,">")) != NULL) strcpy(buf,"&gt;");
-  
-          if(i % 2 == 1 && i != 1){
-             fprintf(fpout1,"%s\n",buf);
+
+          if((i-1)%5 == 0 ){
+             fprintf(fpout,"%s",buf);
           }
+         else{
+          if((i-1)%2 == 0 ){
+             fprintf(fpout,"%s",buf);
+          }
+        }
        }
     }
 	
-    fclose(fpout1);
+    fclose(fpout);
     fclose(fpin);
+
     i = 0;
 	
 // Extract parameters
@@ -139,25 +156,6 @@ int main(int argc, char *argv[ ]){
              continue;
           }
           else{
-             if(i == 2){
-                strcpy(&store[1][1], strtok(buf," "));
-                strcpy(&store[2][1], strtok(NULL," "));
-                strcat(&store[2][1]," ");
-                strcat(&store[2][1],&store[1][1]);
-                strcat(&frame[0],&store[2][1]);
-                strcat(&frame[0]," ");
-                continue;
-             }
-
-             if(i == 3){
-                strcpy(&store[1][1], strtok(buf," "));
-                strcpy(&store[2][1], strtok(NULL," "));
-                strcat(&store[2][1]," ");
-                strcat(&store[2][1],&store[1][1]);
-                strcat(&frame[0],&store[2][1]);
-                strcat(&frame[0]," ");
-                continue;
-             }
 
              if(i % 3 == 1){
                 j++;
@@ -170,8 +168,8 @@ int main(int argc, char *argv[ ]){
                 strcpy(&store[2][1], strtok(NULL," "));
                 strcat(&store[1][1]," ");
                 strcat(&store[1][1],&store[2][1]);
-                strcpy(&coordinate[j][1],&store[1][1]);
-                strcat(&coordinate[j][1]," ");
+                strcpy(&coordinate[j+1][1],&store[1][1]);
+                strcat(&coordinate[j+1][1]," ");
                 k = j;
                 continue;
              }
@@ -181,15 +179,20 @@ int main(int argc, char *argv[ ]){
                 strcpy(&store[2][1], strtok(NULL," "));
                 strcat(&store[1][1]," ");
                 strcat(&store[1][1],&store[2][1]);
-                strcat(&coordinate[k][1],&store[1][1]);
-                strcat(&coordinate[k][1]," ");
+                strcat(&coordinate[k+1][1],&store[1][1]);
+                strcat(&coordinate[k+1][1]," ");
                 continue;
              }
+
           }
        }
     }
 
 // Generate hocr output
+
+   
+
+    fpout= fopen( argv[2],"w");
 
     fprintf(fpout,"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     fprintf(fpout,"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n");
