@@ -51,10 +51,10 @@ class GCVAnnotation:
         self.lang = lang
         self.ocr_class = ocr_class
         self.content = content
-        self.x0 = box[0]['x']
-        self.y0 = box[0]['y']
-        self.x1 = box[2]['x']
-        self.y1 = box[2]['y']
+        self.x0 = box[0]['x'] if 'x' in box[0] else 0
+        self.y0 = box[0]['y'] if 'y' in box[0] else 0
+        self.x1 = box[2]['x'] if 'x' in box[2] else 0
+        self.y1 = box[2]['y'] if 'y' in box[2] else 0
 
     def maximize_bbox(self):
         self.x0 = min([w.x0 for w in self.content])
