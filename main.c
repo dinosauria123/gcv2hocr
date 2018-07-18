@@ -47,27 +47,33 @@ int main(int argc, char *argv[ ]){
 
 while(fgets(buf, MAX, fpin) != NULL ){
      if (strstr(buf, "languageCode") != NULL){   
-	fprintf(fpout,"%s",buf);
-        break;
+			fprintf(fpout,"%s",buf);
+        	break;
      }
 }
 
 while(fgets(buf, MAX, fpin) != NULL ){
 
-      if (strstr(buf,"                                  \"x\"") != NULL){   
-	fprintf(fpout,"%s",buf);
-        continue;
+   if (strstr(buf,"                                  \"x\"") != NULL){
+		if(strstr(buf,",") != NULL){	 
+			fprintf(fpout,"%s",buf);
+			continue;
+		}
+			while ((p = strstr(buf,"\n")) != NULL) *p = ',';
+			fprintf(fpout,"%s",buf);
+			fprintf(fpout,"\n                                  \"y\":   0\n"); //Add 0 for missing Y
+			continue;
 	}
 
-      if (strstr(buf,"                                  \"y\"") != NULL){
-	fprintf(fpout,"%s",buf);
-        continue;
+   if (strstr(buf,"                                  \"y\"") != NULL){
+			fprintf(fpout,"%s",buf);
+        	continue;
 	}
    
-      if (strstr(buf,"                            \"text\"") != NULL){
-          while ((p = strstr(buf,",")) != NULL) *p = ' ';
-	    fprintf(fpout,"%s",buf);
-            continue;
+   if (strstr(buf,"                            \"text\"") != NULL){
+			while ((p = strstr(buf,",")) != NULL) *p = ' ';
+	    	fprintf(fpout,"%s",buf);
+			continue;
 	}
 
 }
@@ -78,7 +84,7 @@ while(fgets(buf, MAX, fpin) != NULL ){
 	fpout = fopen("preout1.txt","w");
 	fpin=fopen ("preout0.txt","r");
 	
-       while(fgets(buf, MAX, fpin) != NULL ){
+	while(fgets(buf, MAX, fpin) != NULL ){
 	   		  
 // Delete tags
 
@@ -86,7 +92,7 @@ while(fgets(buf, MAX, fpin) != NULL ){
           ary[1] = strtok(NULL,",");
 
           if(ary[1] != NULL){
-        	fprintf(fpout,"%s",ary[1]);
+        		fprintf(fpout,"%s",ary[1]);
           }
        }
 
