@@ -5,9 +5,12 @@
 #include <ctype.h>
 #define MAX 8192
 
+char bufcopy(char buf0[MAX], char buf[MAX]);
+
 int main(int argc, char *argv[ ]){
     FILE *fpin,*fpout;
     char buf[MAX]={0};
+    char buf0[MAX]={0};
     char *p;
     char *ary[3];
     char lang[4];
@@ -52,30 +55,72 @@ while(fgets(buf, MAX, fpin) != NULL ){
      }
 }
 
+
 while(fgets(buf, MAX, fpin) != NULL ){
+
+	if (strstr(buf,"                                {},") != NULL){
+			fprintf(fpout,"                                  \"x\":   0,\n");
+			fprintf(fpout,"                                  \"y\":   0\n");
+			bufcopy(buf0, buf);
+			continue;
+	}
+
+if ((strstr(buf,"                                  \"y\": -1") != NULL)*(strstr(buf0,"{") != NULL)){
+			fprintf(fpout,"                                  \"x\":   0,\n");
+			fprintf(fpout,"                                  \"y\":   0\n");
+			bufcopy(buf0, buf);
+			continue;
+	}
+
+	if (strstr(buf,"                                  \"x\": -1") != NULL){
+			fprintf(fpout,"                                  \"x\":   0,\n");
+			if(strstr(buf,",") == NULL){
+				fprintf(fpout,"                                  \"y\":   0\n");
+			}
+			bufcopy(buf0, buf);
+			continue;
+	}
+
+	if (strstr(buf,"                                  \"y\": -1") != NULL){
+			fprintf(fpout,"                                  \"y\":   0\n");
+
+			bufcopy(buf0, buf);
+			continue;
+	}
 
    if (strstr(buf,"                                  \"x\"") != NULL){
 		if(strstr(buf,",") != NULL){	 
 			fprintf(fpout,"%s",buf);
+			bufcopy(buf0, buf);
 			continue;
 		}
 			while ((p = strstr(buf,"\n")) != NULL) *p = ',';
 			fprintf(fpout,"%s",buf);
-			fprintf(fpout,"\n                                  \"y\":   0\n"); //Add 0 for missing Y
+			fprintf(fpout,"\n                                  \"y\":   0\n");
+			bufcopy(buf0, buf);
 			continue;
 	}
 
    if (strstr(buf,"                                  \"y\"") != NULL){
-			fprintf(fpout,"%s",buf);
-        	continue;
+
+		if (strstr(buf0,"{") != NULL){
+				fprintf(fpout,"                                  \"x\":   0,\n");
+		}
+
+		fprintf(fpout,"%s",buf);
+		bufcopy(buf0, buf);
+		continue;
 	}
+
    
    if (strstr(buf,"                            \"text\"") != NULL){
-			while ((p = strstr(buf,",")) != NULL) *p = ' ';
+          while ((p = strstr(buf,",")) != NULL) *p = ' ';
 	    	fprintf(fpout,"%s",buf);
+			bufcopy(buf0, buf);
 			continue;
 	}
 
+	bufcopy(buf0, buf);
 }
 
     fclose(fpout);
@@ -84,7 +129,7 @@ while(fgets(buf, MAX, fpin) != NULL ){
 	fpout = fopen("preout1.txt","w");
 	fpin=fopen ("preout0.txt","r");
 	
-	while(fgets(buf, MAX, fpin) != NULL ){
+       while(fgets(buf, MAX, fpin) != NULL ){
 	   		  
 // Delete tags
 
@@ -241,4 +286,13 @@ while(fgets(buf, MAX, fpin) != NULL ){
     fclose(fpout);
 
     return 0;
+}
+
+char bufcopy(char buf0[MAX], char buf[MAX]){
+
+	int i;
+
+	for(i=0;i<MAX;++i){
+		buf0[i] = buf[i];
+  	}
 }
