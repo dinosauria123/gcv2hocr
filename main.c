@@ -8,236 +8,264 @@
 char bufcopy(char buf0[MAX], char buf[MAX]);
 
 int main(int argc, char *argv[ ]){
-    FILE *fpin,*fpout;
-    char buf[MAX]={0};
-    char buf0[MAX]={0};
-    char *p;
-    char *ary[3];
-    char lang[4];
-    char store[MAX][10]={0,0};
-    char word[MAX][50]={0,0}, coordinate[MAX][50]={0,0}, frame[50]={0};
-    char imgheight[5]="0" , imgwidth[5]="0";
-    int offset = -5; //Adjust for proper y-position. English = -5, Japanese = 0
-    int i = 0, j = 0, k = 0;
+	FILE *fpin,*fpout;
+	char buf[MAX]={0};
+	char buf0[MAX]={0};
+	char *p;
+	char *ary[3];
+	char lang[4];
+	char store[MAX][10]={0,0};
+	char word[MAX][50]={0,0}, coordinate[MAX][50]={0,0}, frame[50]={0};
+	char imgheight[5]="0" , imgwidth[5]="0";
+	int offset = -5; //Adjust for proper y-position. English = -5, Japanese = 0
+	int i = 0, j = 0, k = 0;
 
-    if ((fpin=fopen (argv[1],"r")) == NULL ){
-       printf("No input file.\n");
-    exit(1);
-    }
+	if ((fpin=fopen (argv[1],"r")) == NULL ){
+		printf("No input file.\n");
+		exit(1);
+	}
 
-    if ((fpout=fopen (argv[2],"w")) == NULL){
-       printf("No output file.\n");
-    exit(1);
-    }
+	if ((fpout=fopen (argv[2],"w")) == NULL){
+		printf("No output file.\n");
+		exit(1);
+	}
 
-    if (argc > 5){
-       printf("Wrong argument.\n");
-    exit(1);
-    }
+	if (argc > 5){
+		printf("Wrong argument.\n");
+		exit(1);
+	}
 
-    if ((argv[3] != NULL) && (argv[4] != NULL)){
-       strcpy(&imgheight[0], argv[3]);
-       strcpy(&imgwidth[0], argv[4]);
-    }
+	if ((argv[3] != NULL) && (argv[4] != NULL)){
+		strcpy(&imgheight[0], argv[3]);
+		strcpy(&imgwidth[0], argv[4]);
+	}
 
-    if (!((isdigit(imgheight[0]) && (isdigit(imgwidth[0]))))){
-       printf("Wrong image size.\n");
-    exit(1);
-    }
+	if (!((isdigit(imgheight[0]) && (isdigit(imgwidth[0]))))){
+		printf("Wrong image size.\n");
+		exit(1);
+	}
 	
 	fpout = fopen("preout0.txt","w");
 	fpin=fopen (argv[1],"r");
 
-while(fgets(buf, MAX, fpin) != NULL ){
-     if (strstr(buf, "languageCode") != NULL){   
+// Get Locale
+
+	while(fgets(buf, MAX, fpin) != NULL ){
+
+		if (strstr(buf, "locale") != NULL){
 			fprintf(fpout,"%s",buf);
-        	break;
-     }
-}
-
-
-while(fgets(buf, MAX, fpin) != NULL ){
-
-	if (strstr(buf,"                                {},") != NULL){
-			fprintf(fpout,"                                  \"x\":   0,\n");
-			fprintf(fpout,"                                  \"y\":   0\n");
-			bufcopy(buf0, buf);
+			fprintf(fpout,"\n");
 			continue;
+		}
+	
+		if (strstr(buf, "boundingPoly") != NULL){
+			break;
+		}
 	}
 
-if ((strstr(buf,"                                  \"y\": -1") != NULL)*(strstr(buf0,"{") != NULL)){
-			fprintf(fpout,"                                  \"x\":   0,\n");
-			fprintf(fpout,"                                  \"y\":   0\n");
+// Delete lines below "fullTextAnnotation" tag
+
+	while(fgets(buf, MAX, fpin) != NULL ){
+		if (strstr(buf,"fullTextAnnotation") != NULL){
+	 		break;
+		}
+
+		if (strstr(buf,"              {},") != NULL){
+			fprintf(fpout,"                \"x\": 0,\n");
+			fprintf(fpout,"                \"y\": 0\n");
 			bufcopy(buf0, buf);
 			continue;
-	}
+		}
 
-	if (strstr(buf,"                                  \"x\": -1") != NULL){
-			fprintf(fpout,"                                  \"x\":   0,\n");
+		if (strstr(buf,"                \"y\": -1") != NULL){
+			if (strstr(buf0,"{") != NULL){
+				fprintf(fpout,"                \"x\": 0,\n");
+			}
+			fprintf(fpout,"                \"y\": 0\n");
+			bufcopy(buf0, buf);
+			continue;
+		}
+
+		if (strstr(buf,"                \"x\": -1") != NULL){
+			fprintf(fpout,"                \"x\": 0,\n");
 			if(strstr(buf,",") == NULL){
-				fprintf(fpout,"                                  \"y\":   0\n");
+				fprintf(fpout,"                \"y\": 0\n");
 			}
 			bufcopy(buf0, buf);
 			continue;
-	}
+		}
 
-	if (strstr(buf,"                                  \"y\": -1") != NULL){
-			fprintf(fpout,"                                  \"y\":   0\n");
-
-			bufcopy(buf0, buf);
-			continue;
-	}
-
-   if (strstr(buf,"                                  \"x\"") != NULL){
-		if(strstr(buf,",") != NULL){	 
-			fprintf(fpout,"%s",buf);
+		if (strstr(buf,"                \"y\": -1") != NULL){
+			fprintf(fpout,"                \"y\": 0\n");
 			bufcopy(buf0, buf);
 			continue;
 		}
+
+		if (strstr(buf,"                \"x\"") != NULL){
+			if(strstr(buf,",") != NULL){	 
+				fprintf(fpout,"%s",buf);
+				bufcopy(buf0, buf);
+				continue;
+			}
+
 			while ((p = strstr(buf,"\n")) != NULL) *p = ',';
+
 			fprintf(fpout,"%s",buf);
-			fprintf(fpout,"\n                                  \"y\":   0\n");
+			fprintf(fpout,"\n                \"y\": 0\n");
 			bufcopy(buf0, buf);
 			continue;
-	}
-
-   if (strstr(buf,"                                  \"y\"") != NULL){
-
-		if (strstr(buf0,"{") != NULL){
-				fprintf(fpout,"                                  \"x\":   0,\n");
 		}
+
+		if (strstr(buf,"                \"y\"") != NULL){
+			if (strstr(buf0,"{") != NULL){
+				fprintf(fpout,"                \"x\": 0,\n");
+			}
+			fprintf(fpout,"%s",buf);
+			bufcopy(buf0, buf);
+			continue;
+
+			if (strstr(buf,"                \"x\":") != NULL){
+				fprintf(fpout,"%s",buf);
+				continue;
+			}
+
+			if (strstr(buf,"                \"y\":") != NULL){
+				fprintf(fpout,"%s",buf);
+				continue;
+			}
+		}
+
+		if (strstr(buf,"          \"description\": ") != NULL){
+
+		while ((p = strstr(buf,",")) != NULL) *p = ' ';
 
 		fprintf(fpout,"%s",buf);
 		bufcopy(buf0, buf);
 		continue;
-	}
-
-   
-   if (strstr(buf,"                            \"text\"") != NULL){
-          while ((p = strstr(buf,",")) != NULL) *p = ' ';
-	    	fprintf(fpout,"%s",buf);
-			bufcopy(buf0, buf);
-			continue;
-	}
-
+		}
 	bufcopy(buf0, buf);
-}
+	continue;
+	}
 
-    fclose(fpout);
-    fclose(fpin);
+	fclose(fpout);
+	fclose(fpin);
 	
 	fpout = fopen("preout1.txt","w");
 	fpin=fopen ("preout0.txt","r");
-	
-       while(fgets(buf, MAX, fpin) != NULL ){
+
+	while(fgets(buf, MAX, fpin) != NULL ){
 	   		  
 // Delete tags
+		ary[0] = strtok(buf,":");
+		ary[1] = strtok(NULL,",");
 
-          ary[0] = strtok(buf,":");
-          ary[1] = strtok(NULL,",");
-
-          if(ary[1] != NULL){
-        		fprintf(fpout,"%s",ary[1]);
-          }
-       }
-
+		if(ary[1] != NULL){
+			fprintf(fpout,"%s",ary[1]);
+		}else{
+			fprintf(fpout,"\n");
+		}
+	}
 	
-    fclose(fpout);
-    fclose(fpin);
+	fclose(fpout);
+	fclose(fpin);
 
-    fpout= fopen("preout2.txt","w");
+	fpout= fopen("preout2.txt","w");
 
 
-    if((fpin=fopen("preout1.txt","r"))!=NULL){
-       while(fgets(buf,MAX,fpin) != NULL ){
+	if((fpin=fopen("preout1.txt","r"))!=NULL){
+		while(fgets(buf,MAX,fpin) != NULL ){
 
-          i++;
+			i++;
 		  
-          while ((p = strstr(buf,"\"")) != NULL) *p = ' ';
+			while ((p = strstr(buf,"\"")) != NULL) *p = ' ';
 
           // Replace xml escape characters
 
-          while ((p = strstr(buf,"&")) != NULL){
-             memmove(p,"&amp;",5);
-             break;
-          }
-          while ((p = strstr(buf,"<")) != NULL) strcpy(buf,"&lt;");
-          while ((p = strstr(buf,">")) != NULL) strcpy(buf,"&gt;");
+			while ((p = strstr(buf,"&")) != NULL){
+				memmove(p,"&amp;",5);
+				break;
+			}
+			while ((p = strstr(buf,"<")) != NULL) strcpy(buf,"&lt;");
+			while ((p = strstr(buf,">")) != NULL) strcpy(buf,"&gt;");
 
-          if((i-1)%5 == 0 ){
-             fprintf(fpout,"%s",buf);
-          }
-         else{
-          if((i-1)%2 == 0 ){
-             fprintf(fpout,"%s",buf);
-          }
-        }
-       }
-    }
+			if((i-1)%5 == 0 ){
+				fprintf(fpout,"%s",buf);
+				continue;
+         	 	}
+
+			if((i-2)%5 == 0 ){
+				fprintf(fpout,"%s",buf);
+				continue;
+			}
+
+			if((i-4)%5 == 0 ){
+				fprintf(fpout,"%s",buf);
+				continue;
+			}
+		}
+	}
 	
-    fclose(fpout);
-    fclose(fpin);
+	fclose(fpout);
+	fclose(fpin);
 
-    i = 0;
+	i = 0;
 	
 // Extract parameters
 
-    if((fpin=fopen("preout2.txt","r"))!=NULL){
-       while(fgets(buf,MAX,fpin) != NULL ){
-          while ((p = strstr(buf,"\n")) != NULL) *p = '\0';
+	if((fpin=fopen("preout2.txt","r"))!=NULL){
+		while(fgets(buf,MAX,fpin) != NULL ){
 
-          i++;
-          if(i == 1){
-             if(strstr(buf, "en")){
-                strcpy(&lang[0],"eng");
-                offset = -5;
-             }
+			while ((p = strstr(buf,"\n")) != NULL) *p = '\0';
 
-             if(strstr(buf, "de")){
-                strcpy(&lang[0],"deu");
-                offset = -5;
-             }
+			i++;
+			if(i == 1){
+				if(strstr(buf, "en")){
+				strcpy(&lang[0],"eng");
+				offset = -5;
+			}
 
+			if(strstr(buf, "de")){
+				strcpy(&lang[0],"deu");
+				offset = -5;
+			}
 
-             if(strstr(buf, "ja")){
-                strcpy(&lang[0],"jpn");
-                offset = 0;
-             }
+			if(strstr(buf, "ja")){
+				strcpy(&lang[0],"jpn");
+				offset = 0;
+			}
+			continue;
+			}
+			else{
+ 
+				if(i % 3 == 1){
+				 j++;
+				strcpy(&word[j][1],buf);
+				continue;
+			}
 
-             continue;
-          }
-          else{
+			if(i % 3 == 2){
+                		strcpy(&store[1][1], strtok(buf," "));
+                		strcpy(&store[2][1], strtok(NULL," "));
+                		strcat(&store[1][1]," ");
+                		strcat(&store[1][1],&store[2][1]);
+                		strcpy(&coordinate[j][1],&store[1][1]);
+                		strcat(&coordinate[j][1]," ");
+                		k = j;
+               	 		continue;
+             		}
 
-             if(i % 3 == 1){
-                j++;
-                strcpy(&word[j][1],buf);
-                continue;
-             }
-
-             if(i % 3 == 2){
-                strcpy(&store[1][1], strtok(buf," "));
-                strcpy(&store[2][1], strtok(NULL," "));
-                strcat(&store[1][1]," ");
-                strcat(&store[1][1],&store[2][1]);
-                strcpy(&coordinate[j+1][1],&store[1][1]);
-                strcat(&coordinate[j+1][1]," ");
-                k = j;
-                continue;
-             }
-
-             if(i % 3 == 0){
-                strcpy(&store[1][1], strtok(buf," "));
-                strcpy(&store[2][1], strtok(NULL," "));
-                strcat(&store[1][1]," ");
-                strcat(&store[1][1],&store[2][1]);
-                strcat(&coordinate[k+1][1],&store[1][1]);
-                strcat(&coordinate[k+1][1]," ");
-                continue;
-             }
-
-          }
-       }
-    }
+			if(i % 3 == 0){
+				strcpy(&store[1][1], strtok(buf," "));
+                		strcpy(&store[2][1], strtok(NULL," "));
+                		strcat(&store[1][1]," ");
+                		strcat(&store[1][1],&store[2][1]);
+                		strcat(&coordinate[k][1],&store[1][1]);
+                		strcat(&coordinate[k][1]," ");
+                		continue;
+			}
+		}
+	}
+	}
 
 // Generate hocr output
 
@@ -287,6 +315,8 @@ if ((strstr(buf,"                                  \"y\": -1") != NULL)*(strstr(
 
     return 0;
 }
+
+
 
 char bufcopy(char buf0[MAX], char buf[MAX]){
 
