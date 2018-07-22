@@ -70,6 +70,8 @@ int main(int argc, char *argv[ ]){
 	 		break;
 		}
 
+// When json lacks coordinates or coordinate = "-1"
+
 		if (strstr(buf,"              {},") != NULL){
 			fprintf(fpout,"                \"x\": 0,\n");
 			fprintf(fpout,"                \"y\": 0\n");
@@ -179,7 +181,7 @@ int main(int argc, char *argv[ ]){
 		  
 			while ((p = strstr(buf,"\"")) != NULL) *p = ' ';
 
-          // Replace xml escape characters
+// Replace xml escape characters
 
 			while ((p = strstr(buf,"&")) != NULL){
 				memmove(p,"&amp;",5);
@@ -187,6 +189,8 @@ int main(int argc, char *argv[ ]){
 			}
 			while ((p = strstr(buf,"<")) != NULL) strcpy(buf,"&lt;");
 			while ((p = strstr(buf,">")) != NULL) strcpy(buf,"&gt;");
+
+// Extract text and coodinates
 
 			if((i-1)%5 == 0 ){
 				fprintf(fpout,"%s",buf);
