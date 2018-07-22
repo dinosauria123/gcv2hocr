@@ -238,33 +238,33 @@ int main(int argc, char *argv[ ]){
 			else{
  
 				if(i % 3 == 1){
-				 j++;
-				strcpy(&word[j][1],buf);
-				continue;
-			}
+				 	j++;
+					strcpy(&word[j][1],buf);
+					continue;
+				}
 
-			if(i % 3 == 2){
-                		strcpy(&store[1][1], strtok(buf," "));
-                		strcpy(&store[2][1], strtok(NULL," "));
-                		strcat(&store[1][1]," ");
-                		strcat(&store[1][1],&store[2][1]);
-                		strcpy(&coordinate[j][1],&store[1][1]);
-                		strcat(&coordinate[j][1]," ");
-                		k = j;
-               	 		continue;
-             		}
+				if(i % 3 == 2){
+                			strcpy(&store[1][1], strtok(buf," "));
+                			strcpy(&store[2][1], strtok(NULL," "));
+                			strcat(&store[1][1]," ");
+                			strcat(&store[1][1],&store[2][1]);
+                			strcpy(&coordinate[j][1],&store[1][1]);
+                			strcat(&coordinate[j][1]," ");
+                			k = j;
+               	 			continue;
+	             		}
 
-			if(i % 3 == 0){
-				strcpy(&store[1][1], strtok(buf," "));
-                		strcpy(&store[2][1], strtok(NULL," "));
-                		strcat(&store[1][1]," ");
-                		strcat(&store[1][1],&store[2][1]);
-                		strcat(&coordinate[k][1],&store[1][1]);
-                		strcat(&coordinate[k][1]," ");
-                		continue;
+				if(i % 3 == 0){
+					strcpy(&store[1][1], strtok(buf," "));
+                			strcpy(&store[2][1], strtok(NULL," "));
+                			strcat(&store[1][1]," ");
+                			strcat(&store[1][1],&store[2][1]);
+                			strcat(&coordinate[k][1],&store[1][1]);
+                			strcat(&coordinate[k][1]," ");
+                			continue;
+				}
 			}
 		}
-	}
 	}
 
 // Generate hocr output
