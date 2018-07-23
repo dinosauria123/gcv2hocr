@@ -70,7 +70,7 @@ int main(int argc, char *argv[ ]){
 	 		break;
 		}
 
-// When json lacks coordinates or coordinate = "-1"
+//	Missing x and y
 
 		if (strstr(buf,"              {},") != NULL){
 			fprintf(fpout,"                \"x\": 0,\n");
@@ -78,6 +78,8 @@ int main(int argc, char *argv[ ]){
 			bufcopy(buf0, buf);
 			continue;
 		}
+
+//	y=-1
 
 		if (strstr(buf,"                \"y\": -1") != NULL){
 			if (strstr(buf0,"{") != NULL){
@@ -87,6 +89,8 @@ int main(int argc, char *argv[ ]){
 			bufcopy(buf0, buf);
 			continue;
 		}
+
+//	x=-1
 
 		if (strstr(buf,"                \"x\": -1") != NULL){
 			fprintf(fpout,"                \"x\": 0,\n");
@@ -97,18 +101,15 @@ int main(int argc, char *argv[ ]){
 			continue;
 		}
 
-		if (strstr(buf,"                \"y\": -1") != NULL){
-			fprintf(fpout,"                \"y\": 0\n");
-			bufcopy(buf0, buf);
-			continue;
-		}
-
+// x
 		if (strstr(buf,"                \"x\"") != NULL){
 			if(strstr(buf,",") != NULL){	 
 				fprintf(fpout,"%s",buf);
 				bufcopy(buf0, buf);
 				continue;
 			}
+
+// Missing y
 
 			while ((p = strstr(buf,"\n")) != NULL) *p = ',';
 
@@ -118,24 +119,19 @@ int main(int argc, char *argv[ ]){
 			continue;
 		}
 
+// Missing x
+
 		if (strstr(buf,"                \"y\"") != NULL){
 			if (strstr(buf0,"{") != NULL){
 				fprintf(fpout,"                \"x\": 0,\n");
 			}
+// y
 			fprintf(fpout,"%s",buf);
 			bufcopy(buf0, buf);
 			continue;
-
-			if (strstr(buf,"                \"x\":") != NULL){
-				fprintf(fpout,"%s",buf);
-				continue;
-			}
-
-			if (strstr(buf,"                \"y\":") != NULL){
-				fprintf(fpout,"%s",buf);
-				continue;
-			}
 		}
+
+// Extract text
 
 		if (strstr(buf,"          \"description\": ") != NULL){
 
@@ -145,8 +141,8 @@ int main(int argc, char *argv[ ]){
 		bufcopy(buf0, buf);
 		continue;
 		}
+
 	bufcopy(buf0, buf);
-	continue;
 	}
 
 	fclose(fpout);
@@ -248,24 +244,24 @@ int main(int argc, char *argv[ ]){
 				}
 
 				if(i % 3 == 2){
-                			strcpy(&store[1][1], strtok(buf," "));
-                			strcpy(&store[2][1], strtok(NULL," "));
-                			strcat(&store[1][1]," ");
-                			strcat(&store[1][1],&store[2][1]);
-                			strcpy(&coordinate[j][1],&store[1][1]);
-                			strcat(&coordinate[j][1]," ");
-                			k = j;
-               	 			continue;
+                strcpy(&store[1][1], strtok(buf," "));
+                strcpy(&store[2][1], strtok(NULL," "));
+                strcat(&store[1][1]," ");
+                strcat(&store[1][1],&store[2][1]);
+                strcpy(&coordinate[j][1],&store[1][1]);
+                strcat(&coordinate[j][1]," ");
+                k = j;
+               	continue;
 	             		}
 
 				if(i % 3 == 0){
 					strcpy(&store[1][1], strtok(buf," "));
-                			strcpy(&store[2][1], strtok(NULL," "));
-                			strcat(&store[1][1]," ");
-                			strcat(&store[1][1],&store[2][1]);
-                			strcat(&coordinate[k][1],&store[1][1]);
-                			strcat(&coordinate[k][1]," ");
-                			continue;
+                strcpy(&store[2][1], strtok(NULL," "));
+                strcat(&store[1][1]," ");
+                strcat(&store[1][1],&store[2][1]);
+                strcat(&coordinate[k][1],&store[1][1]);
+                strcat(&coordinate[k][1]," ");
+                continue;
 				}
 			}
 		}
