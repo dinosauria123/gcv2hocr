@@ -244,24 +244,24 @@ int main(int argc, char *argv[ ]){
 				}
 
 				if(i % 3 == 2){
-                strcpy(&store[1][1], strtok(buf," "));
-                strcpy(&store[2][1], strtok(NULL," "));
-                strcat(&store[1][1]," ");
-                strcat(&store[1][1],&store[2][1]);
-                strcpy(&coordinate[j][1],&store[1][1]);
-                strcat(&coordinate[j][1]," ");
-                k = j;
-               	continue;
+					strcpy(&store[1][1], strtok(buf," "));
+					strcpy(&store[2][1], strtok(NULL," "));
+					strcat(&store[1][1]," ");
+					strcat(&store[1][1],&store[2][1]);
+					strcpy(&coordinate[j][1],&store[1][1]);
+					strcat(&coordinate[j][1]," ");
+					k = j;
+					continue;
 	             		}
 
 				if(i % 3 == 0){
 					strcpy(&store[1][1], strtok(buf," "));
-                strcpy(&store[2][1], strtok(NULL," "));
-                strcat(&store[1][1]," ");
-                strcat(&store[1][1],&store[2][1]);
-                strcat(&coordinate[k][1],&store[1][1]);
-                strcat(&coordinate[k][1]," ");
-                continue;
+					strcpy(&store[2][1], strtok(NULL," "));
+					strcat(&store[1][1]," ");
+					strcat(&store[1][1],&store[2][1]);
+					strcat(&coordinate[k][1],&store[1][1]);
+					strcat(&coordinate[k][1]," ");
+					continue;
 				}
 			}
 		}
