@@ -72,7 +72,7 @@ int main(int argc, char *argv[ ]){
 
 //	Missing x and y
 
-		if (strstr(buf,"              {},") != NULL){
+		if (strstr(buf,"              {}") != NULL){
 			fprintf(fpout,"                \"x\": 0,\n");
 			fprintf(fpout,"                \"y\": 0\n");
 			bufcopy(buf0, buf);
@@ -188,17 +188,7 @@ int main(int argc, char *argv[ ]){
 
 // Extract text and coodinates
 
-			if((i-1)%5 == 0 ){
-				fprintf(fpout,"%s",buf);
-				continue;
-         	 	}
-
-			if((i-2)%5 == 0 ){
-				fprintf(fpout,"%s",buf);
-				continue;
-			}
-
-			if((i-4)%5 == 0 ){
+			if ((i-1)%5 == 0|| (i-2)%5 == 0|| (i-4)%5 == 0){
 				fprintf(fpout,"%s",buf);
 				continue;
 			}
