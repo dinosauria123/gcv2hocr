@@ -63,6 +63,8 @@ You may use gcv2hocr.py instead of gcv2hocr executable.
 python gcv2hocr.py test.jpg.json > output.hocr
 ```
 
+--savefile (python only) if defined will output to file instead of console.
+
 ### How to get OCR (json) data:
 
 Execute gcvocr.sh.
