@@ -42,7 +42,8 @@ class GCVAnnotation:
                  page_width=None,
                  content=[],
                  box=None,
-                 title=''):
+                 title='',
+                 savefile=False):
         self.title = title
         self.htmlid = htmlid
         self.baseline = baseline
@@ -77,30 +78,39 @@ def fromResponse(resp, baseline_tolerance=2, **kwargs):
     last_baseline = -100
     page = None
     curline = None
-    for anno_idx, anno_json in enumerate(resp['textAnnotations']):
-        box = anno_json['boundingPoly']['vertices']
-        if anno_idx == 0:
-            page = GCVAnnotation(
-                ocr_class='ocr_page',
-                htmlid='page_0',
-                box=box,
-                **kwargs
-                )
-            continue
-        word = GCVAnnotation(ocr_class='ocrx_word', content=anno_json['description'], box=box)
-#        if word.y1-abs(last_baseline) > baseline_tolerance:
-        curline = GCVAnnotation(
-                ocr_class='ocr_line',
-                htmlid="line_%d" % (len(page.content)),
-                content=[],
-                box=box)
-        page.content.append(curline)
-        last_baseline = word.y1
-        word.htmlid="word_%d_%d" % (len(page.content) - 1, len(curline.content))
-        curline.content.append(word)
-    for line in page.content:
-        line.maximize_bbox()
-    page.maximize_bbox()
+    if isinstance(resp, bool) and not resp:
+        box = [{"x": 0, "y": 0}, {"x": 0, "y": 0}, {"x": 0, "y": 0}, {"x": 0, "y": 0}]
+        page = GCVAnnotation(
+            ocr_class='ocr_page',
+            htmlid='page_0',
+            box=box,
+            **kwargs
+        )
+    else:
+        for anno_idx, anno_json in enumerate(resp['textAnnotations']):
+            box = anno_json['boundingPoly']['vertices']
+            if anno_idx == 0:
+                page = GCVAnnotation(
+                    ocr_class='ocr_page',
+                    htmlid='page_0',
+                    box=box,
+                    **kwargs
+                    )
+                continue
+            word = GCVAnnotation(ocr_class='ocrx_word', content=anno_json['description'], box=box)
+            #if word.y1-abs(last_baseline) > baseline_tolerance:
+            curline = GCVAnnotation(
+                    ocr_class='ocr_line',
+                    htmlid="line_%d" % (len(page.content)),
+                    content=[],
+                    box=box)
+            page.content.append(curline)
+            last_baseline = word.y1
+            word.htmlid="word_%d_%d" % (len(page.content) - 1, len(curline.content))
+            curline.content.append(word)
+        for line in page.content:
+            line.maximize_bbox()
+        page.maximize_bbox()
     if not page.page_width: page.page_width = page.x1
     if not page.page_height: page.page_height = page.y1
     return page
@@ -138,13 +148,24 @@ if __name__ == '__main__':
         "--page-height",
         "-H",
         help="Image height. Automatically detected unless specified")
+    parser.add_argument(
+        "--savefile",
+        help="Save to this file instead of outputting to stdout"
+    )
     args = parser.parse_args()
 
     instream = sys.stdin if args.gcv_file is '-' else open(args.gcv_file, 'r')
-    resp = json.load(instream)['responses'][0]
+    resp = json.load(instream)
+    resp = resp['responses'][0] if 'responses' in resp and len(resp['responses']) >= 0 and "textAnnotations" in resp['responses'][0] else False
     del(args.gcv_file)
     page = fromResponse(resp, **args.__dict__)
-    if str == bytes:
-        print(page.render().encode('utf-8'))
+
+    if args.savefile:
+        with (open(args.savefile, 'w', encoding="utf-8") if str == bytes else open(args.savefile, 'w')) as outfile:
+            outfile.write(page.render().encode('utf-8') if str == bytes else page.render())
+            outfile.close()
     else:
-        print(page.render())
+        if str == bytes:
+            print(page.render().encode('utf-8'))
+        else:
+            print(page.render())
