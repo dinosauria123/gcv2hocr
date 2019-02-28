@@ -6,6 +6,7 @@
 #define MAX 8192
 
 char bufcopy(char buf0[MAX], char buf[MAX]);
+char *replace(char *str, const char *what, const char *with);
 
 int main(int argc, char *argv[ ]){
 	FILE *fpin,*fpout;
@@ -179,12 +180,9 @@ int main(int argc, char *argv[ ]){
 
 // Replace xml escape characters
 
-			while ((p = strstr(buf,"&")) != NULL){
-				memmove(p,"&amp;",5);
-				break;
-			}
-			while ((p = strstr(buf,"<")) != NULL) strcpy(buf,"&lt;");
-			while ((p = strstr(buf,">")) != NULL) strcpy(buf,"&gt;");
+			while ((p = strstr(buf,"&")) != NULL) replace(buf,"&", "&amp;");				
+			while ((p = strstr(buf,"<")) != NULL) replace(buf,"<", "&lt;");
+			while ((p = strstr(buf,">")) != NULL) replace(buf,"<", "&gt;");
 
 // Extract text and coodinates
 
@@ -315,4 +313,17 @@ char bufcopy(char buf0[MAX], char buf[MAX]){
 	for(i=0;i<MAX;++i){
 		buf0[i] = buf[i];
   	}
+}
+
+//This routine is written by URIN HACK (http://urin.github.io/posts/2018/replace-string-by-c-lang)
+char *replace(char *str, const char *what, const char *with)
+{
+  if (!*what) { return str; }
+  char *what_pos = strstr(str, what);
+  if (!what_pos) { return str; }
+  const size_t what_len = strlen(what), with_len = strlen(with);
+  const char *remain = what_pos + what_len;
+  memmove(what_pos + with_len, remain, strlen(remain) + 1);
+  memcpy(what_pos, with, with_len);
+  return str;
 }

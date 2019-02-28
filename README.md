@@ -91,6 +91,11 @@ To Philipp Zumstein, he gave me answers several questions about hocr.
 
 To Konstantin Baierer, he wrote python port (gcv2hocr.py).
 
+To skylord123, he fixed many bugs in python port.
+
+To URIN HACK, he gave me a permission redistribute his replace() code.
+(http://urin.github.io/posts/2018/replace-string-by-c-lang)
+
 ## Licence
 
 ```
