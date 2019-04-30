@@ -5,6 +5,11 @@ import json
 import argparse
 from string import Template
 
+try:
+    from html import escape  # python 3.x
+except ImportError:
+    from cgi import escape  # python 2.x
+
 class GCVAnnotation:
 
     templates = {
@@ -71,7 +76,7 @@ class GCVAnnotation:
         if type(self.content) == type([]):
             content = "".join(map(lambda x: x.render(), self.content))
         else:
-            content = self.content
+            content = escape(self.content)
         return self.__class__.templates[self.ocr_class].substitute(self.__dict__, content=content)
 
 def fromResponse(resp, baseline_tolerance=2, **kwargs):
