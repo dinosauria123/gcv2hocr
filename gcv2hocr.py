@@ -102,6 +102,10 @@ def fromResponse(resp, baseline_tolerance=2, **kwargs):
                     **kwargs
                     )
                 continue
+
+            if not 'description' in anno_json:
+                continue
+
             word = GCVAnnotation(ocr_class='ocrx_word', content=anno_json['description'], box=box)
             #if word.y1-abs(last_baseline) > baseline_tolerance:
             curline = GCVAnnotation(
