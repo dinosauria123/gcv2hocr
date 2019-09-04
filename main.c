@@ -52,13 +52,13 @@ int main(int argc, char *argv[ ]){
 
 	while(fgets(buf, MAX, fpin) != NULL ){
 
-		if (strstr(buf, "locale") != NULL){
+		if (strstr(buf, "\"locale\":") != NULL){
 			fprintf(fpout,"%s",buf);
 			fprintf(fpout,"\n");
 			continue;
 		}
 	
-		if (strstr(buf, "boundingPoly") != NULL){
+		if (strstr(buf, "\"boundingPoly\":") != NULL){
 			break;
 		}
 	}
@@ -66,7 +66,7 @@ int main(int argc, char *argv[ ]){
 // Delete lines below "fullTextAnnotation" tag
 
 	while(fgets(buf, MAX, fpin) != NULL ){
-		if (strstr(buf,"fullTextAnnotation") != NULL){
+		if (strstr(buf,"\"fullTextAnnotation\":") != NULL){
 	 		break;
 		}
 
