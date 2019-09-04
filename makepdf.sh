@@ -25,7 +25,7 @@ do
 done
 
 echo "Generating out.pdf"
-python hocr-pdf ./ > out0.pdf
+python hocr-pdf --savefile out0.pdf ./
 
 echo "Reducing pdf size"
 gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/default -dNOPAUSE -dQUIET -dBATCH -dAutoRotatePages=/None -sOutputFile=out.pdf out0.pdf
