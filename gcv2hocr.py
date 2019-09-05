@@ -88,6 +88,7 @@ def fromResponse(resp, baseline_tolerance=2, **kwargs):
         page = GCVAnnotation(
             ocr_class='ocr_page',
             htmlid='page_0',
+            content=[],
             box=box,
             **kwargs
         )
@@ -98,6 +99,7 @@ def fromResponse(resp, baseline_tolerance=2, **kwargs):
                 page = GCVAnnotation(
                     ocr_class='ocr_page',
                     htmlid='page_0',
+                    content=[],
                     box=box,
                     **kwargs
                     )
