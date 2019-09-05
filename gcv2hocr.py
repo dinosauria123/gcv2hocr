@@ -163,14 +163,14 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
 
-    instream = sys.stdin if args.gcv_file is '-' else open(args.gcv_file, 'r')
+    instream = sys.stdin if args.gcv_file is '-' else open(args.gcv_file, 'r', encoding='utf-8' )
     resp = json.load(instream)
     resp = resp['responses'][0] if 'responses' in resp and len(resp['responses']) >= 0 and "textAnnotations" in resp['responses'][0] else False
     del(args.gcv_file)
     page = fromResponse(resp, **args.__dict__)
 
     if args.savefile:
-        with (open(args.savefile, 'w', encoding="utf-8") if str == bytes else open(args.savefile, 'w')) as outfile:
+        with (open(args.savefile, 'w', encoding="utf-8")) as outfile:
             outfile.write(page.render().encode('utf-8') if str == bytes else page.render())
             outfile.close()
     else:
