@@ -45,10 +45,14 @@ class GCVAnnotation:
                  baseline="0 -5",
                  page_height=None,
                  page_width=None,
-                 content=[],
+                 content=None,
                  box=None,
                  title='',
                  savefile=False):
+        if content==None:
+            self.content = []
+        else:
+            self.content = content
         self.title = title
         self.htmlid = htmlid
         self.baseline = baseline
@@ -56,7 +60,6 @@ class GCVAnnotation:
         self.page_width = page_width
         self.lang = lang
         self.ocr_class = ocr_class
-        self.content = content
         self.x0 = box[0]['x'] if 'x' in box[0] and box[0]['x'] > 0 else 0
         self.y0 = box[0]['y'] if 'y' in box[0] and box[0]['y'] > 0 else 0
         self.x1 = box[2]['x'] if 'x' in box[2] and box[2]['x'] > 0 else 0
@@ -111,7 +114,6 @@ def fromResponse(resp, baseline_tolerance=2, **kwargs):
             curline = GCVAnnotation(
                     ocr_class='ocr_line',
                     htmlid="line_%d" % (len(page.content)),
-                    content=[],
                     box=box)
             page.content.append(curline)
             last_baseline = word.y1
