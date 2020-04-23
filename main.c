@@ -199,7 +199,7 @@ int main(int argc, char *argv[ ]){
 	}	
 	memcpy(buf, buf0, MAX);
 
-// Extract text and coodinates
+// Extract text and coordinates
 
 			if ((i-1)%5 == 0|| (i-2)%5 == 0|| (i-4)%5 == 0){
 				fprintf(fpout,"%s",buf);
