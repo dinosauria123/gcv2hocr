@@ -5,8 +5,6 @@
 #include <ctype.h>
 #define MAX 8192
 
-char bufcopy(char buf0[MAX], char buf[MAX]);
-
 int main(int argc, char *argv[ ]){
 	FILE *fpin,*fpout;
 	char buf[MAX]={0};
@@ -14,8 +12,8 @@ int main(int argc, char *argv[ ]){
 	char *p;
 	char *ary[3];
 	char lang[4];
-	char store[MAX][10]={0,0};
-	char word[MAX][50]={0,0}, coordinate[MAX][50]={0,0}, frame[50]={0};
+	char store[MAX][10]={};
+	char word[MAX][50]={}, coordinate[MAX][50]={};
 	char imgheight[5]="0" , imgwidth[5]="0";
 	int offset = -5; //Adjust for proper y-position. English = -5, Japanese = 0
 	int i = 0, j = 0, k = 0;
@@ -75,7 +73,7 @@ int main(int argc, char *argv[ ]){
 		if (strstr(buf,"              {}") != NULL){
 			fprintf(fpout,"                \"x\": 0,\n");
 			fprintf(fpout,"                \"y\": 0\n");
-			bufcopy(buf0, buf);
+			memcpy(buf0, buf, MAX);
 			continue;
 		}
 
@@ -86,7 +84,7 @@ int main(int argc, char *argv[ ]){
 				fprintf(fpout,"                \"x\": 0,\n");
 			}
 			fprintf(fpout,"                \"y\": 0\n");
-			bufcopy(buf0, buf);
+			memcpy(buf0, buf, MAX);
 			continue;
 		}
 
@@ -97,7 +95,7 @@ int main(int argc, char *argv[ ]){
 			if(strstr(buf,",") == NULL){
 				fprintf(fpout,"                \"y\": 0\n");
 			}
-			bufcopy(buf0, buf);
+			memcpy(buf0, buf, MAX);
 			continue;
 		}
 
@@ -105,7 +103,7 @@ int main(int argc, char *argv[ ]){
 		if (strstr(buf,"                \"x\"") != NULL){
 			if(strstr(buf,",") != NULL){	 
 				fprintf(fpout,"%s",buf);
-				bufcopy(buf0, buf);
+				memcpy(buf0, buf, MAX);
 				continue;
 			}
 
@@ -115,7 +113,7 @@ int main(int argc, char *argv[ ]){
 
 			fprintf(fpout,"%s",buf);
 			fprintf(fpout,"\n                \"y\": 0\n");
-			bufcopy(buf0, buf);
+			memcpy(buf0, buf, MAX);
 			continue;
 		}
 
@@ -127,7 +125,7 @@ int main(int argc, char *argv[ ]){
 			}
 // y
 			fprintf(fpout,"%s",buf);
-			bufcopy(buf0, buf);
+			memcpy(buf0, buf, MAX);
 			continue;
 		}
 
@@ -138,11 +136,11 @@ int main(int argc, char *argv[ ]){
 		while ((p = strstr(buf,",")) != NULL) *p = ' ';
 
 		fprintf(fpout,"%s",buf);
-		bufcopy(buf0, buf);
+		memcpy(buf0, buf, MAX);
 		continue;
 		}
 
-	bufcopy(buf0, buf);
+		memcpy(buf0, buf, MAX);
 	}
 
 	fclose(fpout);
@@ -199,7 +197,7 @@ int main(int argc, char *argv[ ]){
 			break;
 		}
 	}	
-	bufcopy(buf, buf0);
+	memcpy(buf, buf0, MAX);
 
 // Extract text and coodinates
 
@@ -319,15 +317,4 @@ int main(int argc, char *argv[ ]){
     fclose(fpout);
 
     return 0;
-}
-
-
-
-char bufcopy(char buf0[MAX], char buf[MAX]){
-
-	int i;
-
-	for(i=0;i<MAX;++i){
-		buf0[i] = buf[i];
-  	}
 }
