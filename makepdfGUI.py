@@ -61,7 +61,7 @@ class Application(tk.Frame):
 
         dir = os.path.dirname(__file__)
         if glob.glob(dir+"/hocr-pdf.py") == []:
-            messagebox.showerror("Error", 'No hocr-pdf.py. \nCheck hocr-pdf.py and this file \nare in the same directroy.') 
+            messagebox.showerror("Error", 'No hocr-pdf.py. \nCheck hocr-pdf.py and this file \nare in the same directory.')
             exit(1)
         dname = filedialog.askdirectory(initialdir = dir)
         
