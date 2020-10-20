@@ -68,13 +68,16 @@ class GCVAnnotation:
         self.page_width = GCVAnnotation.width if GCVAnnotation.width else page_width
         self.lang = lang
         self.ocr_class = ocr_class
-        self.x0 = int(float(self.page_width*(box[0]['x'] if 'x' in box[0] and box[0]['x'] > 0 else 0)))
-        self.y0 = int(float(self.page_height*(box[0]['y'] if 'y' in box[0] and box[0]['y'] > 0 else 0)))
-        self.x1 = int(float(self.page_width*(box[2]['x'] if 'x' in box[2] and box[2]['x'] > 0 else 0)))
-        self.y1 = int(float(self.page_height*(box[2]['y'] if 'y' in box[2] and box[2]['y'] > 0 else 0)))
-        # print(self.x0,self.y0,self.x1,self.y1)
-
-        # print(GCVAnnotation.height, GCVAnnotation.width)
+        try:
+            self.x0 = int(float(self.page_width*(box[0]['x'] if 'x' in box[0] and box[0]['x'] > 0 else 0)))
+            self.y0 = int(float(self.page_height*(box[0]['y'] if 'y' in box[0] and box[0]['y'] > 0 else 0)))
+            self.x1 = int(float(self.page_width*(box[2]['x'] if 'x' in box[2] and box[2]['x'] > 0 else 0)))
+            self.y1 = int(float(self.page_height*(box[2]['y'] if 'y' in box[2] and box[2]['y'] > 0 else 0)))
+        except ValueError as e:
+            output = 'Input JSON does not have proper boundingBox values. ' \
+                      'This page of the PDF either must not have been ' \
+                      'parsed correctly by GCV or the JSON is somehow corrupt.'
+            print(e, "\n", output)
 
     def maximize_bbox(self):
         self.x0 = min([w.x0 for w in self.content])
@@ -94,7 +97,7 @@ class GCVAnnotation:
         return self.__class__.templates[self.ocr_class].substitute(self.__dict__, content=content)
 
 def fromResponse(resp, file_name, baseline_tolerance=2, **kwargs):
-    #last_baseline = -100
+    # last_baseline = -100
     page = None
     curline = None
     if isinstance(resp, bool) and not resp:
@@ -106,7 +109,6 @@ def fromResponse(resp, file_name, baseline_tolerance=2, **kwargs):
             title = file_name
         )
     else:
-        # print("FTAAAAAA",resp['responses'][0]['fullTextAnnotation'])
         for page_id, page_json in enumerate(resp['responses'][0]['fullTextAnnotation']['pages']):
           box = [{"x": 0, "y": 0}, {"x": 0, "y": 0}, {"x": 0, "y": 0}, {"x": 0, "y": 0}]
           GCVAnnotation.height = page_json.get('width')
@@ -117,13 +119,12 @@ def fromResponse(resp, file_name, baseline_tolerance=2, **kwargs):
                     box=box,
                     title=file_name
                     )
-          # print(page.page_width, page.page_height)
           for block_id, block_json in enumerate(page_json['blocks']):
             box = block_json['boundingBox']['normalizedVertices']
             block = GCVAnnotation(ocr_class='ocr_carea',htmlid="block_%d" % block_id, box=box)
             page.content.append(block)
 
-            line_id = 0;
+            line_id = 0
             for paragraph_id, paragraph_json in enumerate(block_json['paragraphs']):
                 box = paragraph_json['boundingBox']['normalizedVertices']
                 par = GCVAnnotation(ocr_class='ocr_par',htmlid="par_"+ str(block_id) + "_" + str(paragraph_id), box=box)
