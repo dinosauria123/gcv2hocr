@@ -12,6 +12,9 @@ except ImportError:
 
 class GCVAnnotation:
 
+    height = None
+    width = None
+
     templates = {
         'ocr_page': Template("""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -61,14 +64,17 @@ class GCVAnnotation:
         self.title = title
         self.htmlid = htmlid
         self.baseline = baseline
-        self.page_height = page_height
-        self.page_width = page_width
+        self.page_height = GCVAnnotation.height if GCVAnnotation.height else page_height
+        self.page_width = GCVAnnotation.width if GCVAnnotation.width else page_width
         self.lang = lang
         self.ocr_class = ocr_class
-        self.x0 = box[0]['x'] if 'x' in box[0] and box[0]['x'] > 0 else 0
-        self.y0 = box[0]['y'] if 'y' in box[0] and box[0]['y'] > 0 else 0
-        self.x1 = box[2]['x'] if 'x' in box[2] and box[2]['x'] > 0 else 0
-        self.y1 = box[2]['y'] if 'y' in box[2] and box[2]['y'] > 0 else 0
+        self.x0 = int(float(self.page_width*(box[0]['x'] if 'x' in box[0] and box[0]['x'] > 0 else 0)))
+        self.y0 = int(float(self.page_height*(box[0]['y'] if 'y' in box[0] and box[0]['y'] > 0 else 0)))
+        self.x1 = int(float(self.page_width*(box[2]['x'] if 'x' in box[2] and box[2]['x'] > 0 else 0)))
+        self.y1 = int(float(self.page_height*(box[2]['y'] if 'y' in box[2] and box[2]['y'] > 0 else 0)))
+        # print(self.x0,self.y0,self.x1,self.y1)
+
+        # print(GCVAnnotation.height, GCVAnnotation.width)
 
     def maximize_bbox(self):
         self.x0 = min([w.x0 for w in self.content])
@@ -100,33 +106,37 @@ def fromResponse(resp, file_name, baseline_tolerance=2, **kwargs):
             title = file_name
         )
     else:
-        for page_id, page_json in enumerate(resp['fullTextAnnotation']['pages']):
+        # print("FTAAAAAA",resp['responses'][0]['fullTextAnnotation'])
+        for page_id, page_json in enumerate(resp['responses'][0]['fullTextAnnotation']['pages']):
           box = [{"x": 0, "y": 0}, {"x": 0, "y": 0}, {"x": 0, "y": 0}, {"x": 0, "y": 0}]
+          GCVAnnotation.height = page_json.get('width')
+          GCVAnnotation.width = page_json.get('height')
           page = GCVAnnotation(
                     ocr_class='ocr_page',
                     htmlid='page'+ str(page_id),
                     box=box,
                     title=file_name
                     )
+          # print(page.page_width, page.page_height)
           for block_id, block_json in enumerate(page_json['blocks']):
-            box = block_json['boundingBox']['vertices']
+            box = block_json['boundingBox']['normalizedVertices']
             block = GCVAnnotation(ocr_class='ocr_carea',htmlid="block_%d" % block_id, box=box)
             page.content.append(block)
 
             line_id = 0;
             for paragraph_id, paragraph_json in enumerate(block_json['paragraphs']):
-                box = paragraph_json['boundingBox']['vertices']
+                box = paragraph_json['boundingBox']['normalizedVertices']
                 par = GCVAnnotation(ocr_class='ocr_par',htmlid="par_"+ str(block_id) + "_" + str(paragraph_id), box=box)
                 block.content.append(par)
                 curline = GCVAnnotation(ocr_class='ocr_line', htmlid="line_"+ str(block_id) + "_" + str(paragraph_id)+"_"+ str(line_id), box=box)
                 par.content.append(curline)
                 for word_id, word_json in enumerate(paragraph_json['words']):
-                    box = word_json['boundingBox']['vertices']
+                    box = word_json['boundingBox']['normalizedVertices']
                     word_text = ''.join([
                         symbol['text'] for symbol in word_json['symbols']
                     ])
                     word = GCVAnnotation(ocr_class='ocrx_word', htmlid="word_"+ str(block_id) + "_" + str(paragraph_id)+"_"+ str(word_id), content=word_text, box=box)
-                   
+
                     curline.content.append(word)
                     for symbol_id, symbol_json in enumerate(word_json['symbols']):
                          if 'property' in symbol_json and 'detectedBreak' in symbol_json['property'] and 'type' in symbol_json['property']['detectedBreak']:
@@ -134,9 +144,6 @@ def fromResponse(resp, file_name, baseline_tolerance=2, **kwargs):
                                  line_id = line_id + 1
                                  curline = GCVAnnotation(ocr_class='ocr_line', htmlid="line_"+ str(block_id) + "_" + str(paragraph_id)+"_"+ str(line_id), box=box)
                                  par.content.append(curline)
-
-        page.page_width = page_json['width']
-        page.page_height = page_json['height']
     return page
 
 if __name__ == '__main__':
@@ -178,7 +185,7 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
 
-    instream = sys.stdin if args.gcv_file is '-' else open(args.gcv_file, 'r', encoding='utf-8' )
+    instream = sys.stdin if (args.gcv_file == '-') else open(args.gcv_file, 'r', encoding='utf-8' )
     resp = json.load(instream)
     page = fromResponse(resp, str(args.gcv_file.rsplit('.',1)[0]), **args.__dict__)
 
